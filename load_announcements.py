@@ -36,7 +36,15 @@ def announcement_from_json(item):
         logging.warning("Cannot create announcement from %s" % item)
         return None
 
-# TODO: load_announcements_from_sgx to update latest announcements from sgx.com
+def load_announcements_from_sgx():
+    SGX_ANNOUNCEMENTS_URL = 'http://sgx.com/proxy/SgxDominoHttpProxy?timeout=1000&dominoHost=http%3A%2F%2Finfofeed.sgx.com%2FApps%3FA%3DCOW_CorpAnnouncement_Content%26B%3DAnnouncementLast3Months%26R_C%3D%26C_T%3D300'
+    f = urllib.urlopen(SGX_ANNOUNCEMENTS_URL)
+    json_data = f.read()[4:]
+    f.close()
+    load_announcements(json_data)
+
+def _sgx_key_exists(session, sgx_key):
+    return session.query(exists().where(Announcement.sgx_key == sgx_key)).scalar()
 
 def load_announcements(json_data):
     data = json.loads(json_data)
@@ -48,7 +56,7 @@ def load_announcements(json_data):
     for item in items:
         announcement = announcement_from_json(item)
 
-        if announcement:
+        if announcement and not _sgx_key_exists(session, announcement.sgx_key):
             session.add(announcement)
             print "Added %s" % announcement
 
