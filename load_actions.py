@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 import json
 from datetime import datetime
 from sqlalchemy.sql import exists
@@ -38,8 +40,8 @@ def action_from_json(item):
         logging.warning("Cannot create action from %s" % item)
         return None
 
-def load_actions_from_sgx():
-    SGX_ACTIONS_URL = 'http://sgx.com/proxy/SgxDominoHttpProxy?timeout=1000&dominoHost=http%3A%2F%2Finfofeed.sgx.com%2FApps%3FA%3DCow_CorporateInformation_Content%26B%3DCorpDistributionByExDate%26C_T%3D200'
+def load_actions_from_sgx(n):
+    SGX_ACTIONS_URL = 'http://sgx.com/proxy/SgxDominoHttpProxy?timeout=1000&dominoHost=http%3A%2F%2Finfofeed.sgx.com%2FApps%3FA%3DCow_CorporateInformation_Content%26B%3DCorpDistributionByExDate%26C_T%3D' + ("%d" % n)
     f = urllib.urlopen(SGX_ACTIONS_URL)
     json_data = f.read()[4:]
     f.close()
@@ -64,3 +66,10 @@ def load_actions(json_data):
             print "Added %s" % action
 
     session.commit()
+
+if __name__ == "__main__":
+    import sys
+    try:
+        load_actions_from_sgx(int(sys.argv[1]))
+    except IndexError:
+        load_actions_from_sgx(200)

@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 import json
 from datetime import datetime
 from sqlalchemy.sql import exists
@@ -36,8 +38,8 @@ def announcement_from_json(item):
         logging.warning("Cannot create announcement from %s" % item)
         return None
 
-def load_announcements_from_sgx():
-    SGX_ANNOUNCEMENTS_URL = 'http://sgx.com/proxy/SgxDominoHttpProxy?timeout=1000&dominoHost=http%3A%2F%2Finfofeed.sgx.com%2FApps%3FA%3DCOW_CorpAnnouncement_Content%26B%3DAnnouncementLast3Months%26R_C%3D%26C_T%3D300'
+def load_announcements_from_sgx(n):
+    SGX_ANNOUNCEMENTS_URL = 'http://sgx.com/proxy/SgxDominoHttpProxy?timeout=1000&dominoHost=http%3A%2F%2Finfofeed.sgx.com%2FApps%3FA%3DCOW_CorpAnnouncement_Content%26B%3DAnnouncementLast3Months%26R_C%3D%26C_T%3D' + ("%d" % n)
     f = urllib.urlopen(SGX_ANNOUNCEMENTS_URL)
     json_data = f.read()[4:]
     f.close()
@@ -61,3 +63,10 @@ def load_announcements(json_data):
             print "Added %s" % announcement
 
     session.commit()
+
+if __name__ == "__main__":
+    import sys
+    try:
+        load_announcements_from_sgx(int(sys.argv[1]))
+    except IndexError:
+        load_announcements_from_sgx(200)
