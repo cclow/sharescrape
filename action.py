@@ -14,6 +14,7 @@ class Action(Base):
     paid_date   = Column(Date)
     notes       = Column(String)
     siblings    = Column(String)
+    symbol      = Column(String)
 
     def __repr__(self):
         return "<Action(sgx_key='%d', type='%s', company='%s', ex_date='%s', notes='%s')>" % (self.sgx_key, self.type, self.company_name, datetime.strftime(self.ex_date, "%d-%m-%Y"), self.notes)

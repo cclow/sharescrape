@@ -15,6 +15,7 @@ class Announcement(Base):
     category_name = Column(String)
     title       = Column(String)
     siblings    = Column(String)
+    symbol      = Column(String)
 
     def __repr__(self):
         return "<Announcement(security='%s', broadcast_time='%s', category='%s', title='%s')>" % (self.security_name, datetime.strftime(self.broadcast_time, "%d %b %Y %H:%M:%S"), self.category_name, self.title)

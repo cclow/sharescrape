@@ -11,4 +11,6 @@ Session = sessionmaker(bind=engine)
 def create_tables():
     import action
     import announcement
+    import sgx_action_security
+    import sgx_announcement_security
     Base.metadata.create_all(engine)
