@@ -7,6 +7,7 @@ import urllib
 import logging
 
 from action import Action
+from sgx_action_security import SgxActionSecurity
 from db import Session
 
 def _to_date(str):
@@ -31,8 +32,9 @@ def action_from_json(item):
         ex_date = _to_date(item[EX_DATE_KEY])
         record_date = _to_date(item[RECORD_DATE_KEY])
         paid_date = _to_date(item[PAID_DATE_KEY])
+        company_name=item[COMPANY_NAME_KEY]
         return Action(sgx_key=sgx_key, type=item[TYPE_KEY], 
-                company_name=item[COMPANY_NAME_KEY],
+                company_name=item[COMPANY_NAME_KEY].upper(),
                 ex_date=ex_date, record_date=record_date,
                 paid_date=paid_date, notes=item[NOTES_KEY],
                 siblings=item[SIBLINGS_KEY])
@@ -62,6 +64,15 @@ def load_actions(json_data):
         action = action_from_json(item)
 
         if action and not _sgx_key_exists(session, action.sgx_key):
+            security_query = session.query(SgxActionSecurity).filter(SgxActionSecurity.company_name == action.company_name)
+            if (security_query.count() == 0):
+                # New company_name
+                security = SgxActionSecurity(company_name=action.company_name)
+                session.add(security)
+            else:
+                security = security_query.one()
+                if (security.symbol != None):
+                    action.symbol = security.symbol
             session.add(action)
             print "Added %s" % action
 
