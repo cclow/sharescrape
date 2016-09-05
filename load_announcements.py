@@ -3,7 +3,7 @@
 import json
 from datetime import datetime
 from sqlalchemy.sql import exists
-import urllib
+import urllib2
 import logging
 
 from announcement import Announcement
@@ -40,7 +40,9 @@ def announcement_from_json(item):
 
 def load_announcements_from_sgx(n):
     SGX_ANNOUNCEMENTS_URL = 'http://sgx.com/proxy/SgxDominoHttpProxy?timeout=1000&dominoHost=http%3A%2F%2Finfofeed.sgx.com%2FApps%3FA%3DCOW_CorpAnnouncement_Content%26B%3DAnnouncementLast3Months%26R_C%3D%26C_T%3D' + ("%d" % n)
-    f = urllib.urlopen(SGX_ANNOUNCEMENTS_URL)
+    req = urllib2.Request(SGX_ANNOUNCEMENTS_URL)
+    req.add_header('User-Agent', 'Chrome')
+    f = urllib2.urlopen(req)
     json_data = f.read()[4:]
     f.close()
     load_announcements(json_data)

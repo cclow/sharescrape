@@ -3,7 +3,7 @@
 import json
 from datetime import datetime
 from sqlalchemy.sql import exists
-import urllib
+import urllib2
 import logging
 
 from action import Action
@@ -44,7 +44,9 @@ def action_from_json(item):
 
 def load_actions_from_sgx(n):
     SGX_ACTIONS_URL = 'http://sgx.com/proxy/SgxDominoHttpProxy?timeout=1000&dominoHost=http%3A%2F%2Finfofeed.sgx.com%2FApps%3FA%3DCow_CorporateInformation_Content%26B%3DCorpDistributionByExDate%26C_T%3D' + ("%d" % n)
-    f = urllib.urlopen(SGX_ACTIONS_URL)
+    req = urllib2.Request(SGX_ACTIONS_URL)
+    req.add_header('User-Agent', 'Chrome')
+    f = urllib2.urlopen(req)
     json_data = f.read()[4:]
     f.close()
     load_actions(json_data)
